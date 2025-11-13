@@ -1,0 +1,302 @@
+# Changelog Manager Configuration
+# Place this file as .changelog.yaml in your repository root
+
+# Changelog settings (developer-focused CHANGELOG.md)
+changelog:
+  # Use conventional commits for automatic categorization
+  conventional_commits: true
+  
+  # Include full commit hash in entries
+  include_commit_hash: false
+  
+  # Include short hash (7 chars) in entries
+  include_short_hash: true
+  
+  # Include author attribution (@username)
+  include_authors: true
+  
+  # Include PR/issue numbers
+  include_references: true
+  
+  # Group commits by these strategies (order matters)
+  grouping:
+    - pull_request      # Group by PR first
+    - feature_branch    # Then by feature branch
+    - semantic_similarity # Finally by related changes
+  
+  # Categories to use (Keep a Changelog format)
+  categories:
+    - Added
+    - Changed
+    - Deprecated
+    - Removed
+    - Fixed
+    - Security
+  
+  # Indicators of breaking changes
+  breaking_indicators:
+    - "BREAKING CHANGE:"
+    - "BREAKING:"
+    - "!:"              # Conventional commit breaking change
+  
+  # Files/patterns to ignore
+  ignore_patterns:
+    - "^docs:"         # Documentation-only commits
+    - "^chore\\(deps"  # Dependency updates
+    - "^Merge branch"  # Merge commits
+    - "^wip:"          # Work in progress
+
+# Release notes settings (user-focused RELEASE_NOTES.md)
+release_notes:
+  # Target audience
+  audience: "end-users"  # Options: "end-users", "developers", "stakeholders"
+  
+  # Writing tone
+  tone: "professional"   # Options: "professional", "casual", "technical"
+  
+  # Include visual elements (screenshots/gifs)
+  include_visuals: false
+  
+  # Use emoji in headings and bullets
+  use_emoji: true
+  
+  # Emoji mapping for categories
+  emoji_map:
+    features: "✨"
+    improvements: "⚡"
+    fixes: "🐛"
+    security: "🔒"
+    breaking: "⚠️"
+    deprecated: "📝"
+  
+  # Maximum entries per category (0 = unlimited)
+  max_entries: 5
+  
+  # Highlight threshold (changes with this many files get highlighted)
+  highlight_threshold: 20
+  
+  # Include "Coming Soon" section
+  include_upcoming: true
+
+# Version management
+versioning:
+  # Versioning strategy
+  strategy: "semver"  # Options: "semver", "calver", "custom"
+  
+  # Semantic versioning configuration
+  semver:
+    # Format: MAJOR.MINOR.PATCH[-PRERELEASE][+BUILD]
+    include_v_prefix: true  # Use "v" prefix (v1.0.0 vs 1.0.0)
+    
+  # Calendar versioning configuration (if strategy: "calver")
+  calver:
+    format: "YYYY.MM.DD"  # Options: "YYYY.MM.DD", "YYYY.MM", "YY.MM"
+    
+  # Auto-bump rules (for semver)
+  auto_bump:
+    breaking: "major"    # Breaking changes trigger major bump
+    features: "minor"    # New features trigger minor bump
+    fixes: "patch"       # Bug fixes trigger patch bump
+    
+  # Pre-release tags
+  prerelease_tags:
+    - alpha
+    - beta
+    - rc
+    - preview
+    
+  # Files containing version numbers to update
+  version_files:
+    - path: package.json
+      pattern: '"version": "{version}"'
+    - path: setup.py
+      pattern: 'version="{version}"'
+    - path: pyproject.toml
+      pattern: 'version = "{version}"'
+    - path: VERSION
+      pattern: '{version}'
+    - path: src/version.py
+      pattern: 'VERSION = "{version}"'
+
+# AI analysis settings
+ai_analysis:
+  # Model for commit analysis
+  model: "claude-3-haiku"  # Fast and efficient for code analysis
+  
+  # Analyze commits with unclear messages
+  analyze_unclear: true
+  
+  # Keywords that trigger AI analysis
+  unclear_keywords:
+    - "fix"
+    - "update"
+    - "change"
+    - "modify"
+    - "stuff"
+    - "things"
+    - "misc"
+    - "various"
+  
+  # Analyze large diffs for better understanding
+  analyze_large_diffs: true
+  
+  # Threshold for "large" diff (lines changed)
+  large_diff_threshold: 100
+  
+  # Maximum tokens per analysis (cost control)
+  max_tokens_per_analysis: 500
+  
+  # Batch size for parallel processing
+  batch_size: 10
+  
+  # Cache analysis results
+  enable_cache: true
+  cache_ttl: 30  # Days
+
+# Release configuration
+release:
+  # Branches allowed for releases
+  allowed_branches:
+    - main
+    - master
+    - release/*
+    - hotfix/*
+  
+  # Required checks before release
+  pre_release_checks:
+    tests_pass: true
+    no_uncommitted: true
+    changelog_valid: true
+    branch_up_to_date: true
+  
+  # Automatically create these during release
+  auto_create:
+    git_tag: true
+    git_commit: true
+    release_branch: false
+    github_release: false
+  
+  # Tag message template
+  tag_message_template: "Release {version}"
+  
+  # Commit message template
+  commit_message_template: "chore(release): Prepare v{version}"
+  
+  # Post-release actions
+  post_release:
+    - create_unreleased_section
+    - update_readme_badge
+    - notify_team
+
+# Monorepo configuration (optional)
+monorepo:
+  enabled: false
+  
+  # Package directories
+  packages:
+    - packages/core
+    - packages/cli
+    - packages/ui
+  
+  # Version independently
+  independent_versioning: false
+  
+  # Create root changelog
+  root_changelog: true
+  
+  # Include package prefix in entries
+  include_package_prefix: true
+
+# Integration settings
+integrations:
+  # GitHub integration
+  github:
+    enabled: true
+    create_releases: false
+    release_draft: true
+    
+  # GitLab integration
+  gitlab:
+    enabled: false
+    create_releases: false
+    
+  # Jira integration
+  jira:
+    enabled: false
+    url: "https://company.atlassian.net"
+    project_key: "PROJ"
+    
+  # Slack notifications
+  slack:
+    enabled: false
+    webhook_url: ""
+    channel: "#releases"
+
+# Output formatting
+output:
+  # Date format in changelogs
+  date_format: "YYYY-MM-DD"  # ISO 8601
+  
+  # Line width for wrapping
+  line_width: 80
+  
+  # Indentation
+  indent_size: 2
+  
+  # Include table of contents
+  include_toc: true
+  
+  # Include statistics section
+  include_stats: true
+  
+  # Include contributor list
+  include_contributors: true
+
+# Advanced settings
+advanced:
+  # Parallel processing
+  parallel_processing: true
+  
+  # Number of workers for parallel processing
+  workers: 4
+  
+  # Memory limit per worker (MB)
+  memory_limit: 512
+  
+  # Timeout per analysis (seconds)
+  analysis_timeout: 30
+  
+  # Retry failed analyses
+  retry_failed: true
+  max_retries: 3
+  
+  # Verbose output
+  verbose: false
+  
+  # Debug mode
+  debug: false
+
+# Hooks (optional)
+hooks:
+  # Pre-release hook script
+  pre_release: ".changelog-hooks/pre-release.sh"
+  
+  # Post-release hook script
+  post_release: ".changelog-hooks/post-release.sh"
+  
+  # Pre-update hook script
+  pre_update: ".changelog-hooks/pre-update.sh"
+  
+  # Post-update hook script
+  post_update: ".changelog-hooks/post-update.sh"
+
+# Custom templates (optional)
+templates:
+  # Custom changelog entry template
+  changelog_entry: "- {description} ({references})"
+  
+  # Custom release notes feature template
+  release_feature: "### {emoji} {title}\n{description}\n"
+  
+  # Custom version header template
+  version_header: "## [{version}] - {date}"

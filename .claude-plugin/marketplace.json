@@ -1,66 +1,16 @@
 {
-  "name": "changelog-manager-marketplace",
-  "version": "1.0.0",
+  "name": "marketplace",
   "description": "Professional changelog and release notes management for software projects",
-  "author": {
-    "name": "Dr. Martin",
-    "email": "martin@zemantiq.com",
-    "url": "https://github.com/dr-martin"
+  "owner": {
+    "name": "Dr. Martin Thorsen Ranang",
+    "email": "ranang+marketplace@gmail.com",
+    "url": "https://github.com/mtr"
   },
-  "repository": "https://github.com/dr-martin/changelog-manager-marketplace",
   "plugins": [
     {
       "name": "changelog-manager",
-      "version": "1.0.0",
-      "description": "AI-powered changelog and release notes generation from git history",
-      "author": "Dr. Martin",
-      "tags": [
-        "changelog",
-        "release-notes",
-        "documentation",
-        "git",
-        "versioning",
-        "automation",
-        "ai-enhanced"
-      ],
-      "source": {
-        "type": "git",
-        "url": "https://github.com/dr-martin/changelog-manager.git",
-        "ref": "v1.0.0"
-      },
-      "readme": "https://github.com/dr-martin/changelog-manager/blob/main/README.md",
-      "homepage": "https://github.com/dr-martin/changelog-manager",
-      "license": "MIT",
-      "features": [
-        "Dual documentation generation (technical and user-facing)",
-        "AI-powered commit analysis with Claude Haiku",
-        "Intelligent commit grouping and categorization",
-        "Semantic versioning support",
-        "Keep a Changelog compliance",
-        "Incremental updates",
-        "Breaking change detection",
-        "Multi-language code understanding",
-        "Monorepo support",
-        "Platform integration (GitHub, GitLab, Jira)"
-      ],
-      "requirements": {
-        "claude_code": ">=1.0.0",
-        "git": ">=2.0.0"
-      },
-      "commands": [
-        "/changelog",
-        "/changelog-init",
-        "/changelog-release"
-      ],
-      "agents": [
-        "git-history-analyzer",
-        "commit-analyst",
-        "changelog-synthesizer"
-      ],
-      "models": {
-        "primary": "claude-3-5-sonnet-latest",
-        "analysis": "claude-3-haiku-latest"
-      }
+      "source": "./changelog-manager",
+      "description": "AI-powered changelog and release notes generation from git history"
     }
   ]
 }

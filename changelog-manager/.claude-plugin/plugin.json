@@ -1,0 +1,23 @@
+{
+  "name": "changelog-manager",
+  "version": "1.0.0",
+  "description": "Intelligent CHANGELOG.md and RELEASE_NOTES.md management through git history analysis and AI-powered commit understanding",
+  "author": {
+    "name": "Dr. Martin Thorsen Ranang",
+    "email": "ranang+marketplace@gmail.com",
+    "url": "https://github.com/mtr"
+  },
+  "homepage": "https://github.com/mtr/marketplace/changelog-manager",
+  "repository": "https://github.com/mtr/marketplace/changelog-manager",
+  "license": "MIT",
+  "keywords": [
+    "changelog",
+    "release-notes",
+    "git",
+    "documentation",
+    "versioning",
+    "semantic-version",
+    "commit-analysis",
+    "ai-powered"
+  ]
+}
