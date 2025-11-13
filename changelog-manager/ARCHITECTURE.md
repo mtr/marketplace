@@ -6,23 +6,23 @@ The changelog-manager plugin follows a sophisticated multi-agent architecture de
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                     User Interface                           │
-│                   /changelog Commands                        │
+│                     User Interface                          │
+│                   /changelog Commands                       │
 └──────────────────────┬──────────────────────────────────────┘
                        │
 ┌──────────────────────▼──────────────────────────────────────┐
-│                  Command Orchestration                       │
-│              /changelog, /changelog-init,                    │
-│                  /changelog-release                          │
+│                  Command Orchestration                      │
+│              /changelog, /changelog-init,                   │
+│                  /changelog-release                         │
 └──────┬────────────────┬────────────────┬────────────────────┘
        │                │                │
        ▼                ▼                ▼
 ┌──────────────┐ ┌──────────────┐ ┌──────────────────────────┐
-│ Git History  │ │   Commit     │ │  Changelog Synthesizer    │
+│ Git History  │ │   Commit     │ │  Changelog Synthesizer   │
 │  Analyzer    │ │   Analyst    │ │       (Sonnet)           │
 │  (Sonnet)    │ │   (Haiku)    │ │                          │
 ├──────────────┤ ├──────────────┤ ├──────────────────────────┤
-│ - Extract    │ │ - Analyze    │ │ - Generate CHANGELOG.md    │
+│ - Extract    │ │ - Analyze    │ │ - Generate CHANGELOG.md  │
 │   commits    │ │   diffs      │ │ - Generate RELEASE_NOTES │
 │ - Group      │ │ - Understand │ │ - Version management     │
 │   changes    │ │   purpose    │ │ - Format compliance      │
@@ -71,12 +71,12 @@ The changelog-manager plugin follows a sophisticated multi-agent architecture de
 
 The plugin uses a dual-model approach optimized for both quality and efficiency:
 
-1. **Claude 3.5 Sonnet** (Primary Model)
+1. **Claude 4.5 Sonnet** (Primary Model)
    - Used for: High-level analysis, pattern recognition, synthesis
    - Agents: git-history-analyzer, changelog-synthesizer
    - Rationale: Complex reasoning and generation tasks
 
-2. **Claude 3 Haiku** (Analysis Model)
+2. **Claude 4.5 Haiku** (Analysis Model)
    - Used for: Individual commit analysis, diff understanding
    - Agent: commit-analyst
    - Rationale: Fast, efficient, cost-effective for repetitive analysis

@@ -5,7 +5,8 @@ aliases: ["cl-release", "release-prep"]
 
 # changelog-release
 
-Orchestrate the complete release preparation process including changelog finalization, version bumping, and release artifact generation.
+Orchestrate the complete release preparation process including changelog
+finalization, version bumping, and release artifact generation.
 
 ## Usage
 
@@ -21,6 +22,7 @@ Orchestrate the complete release preparation process including changelog finaliz
 ## Release Workflow
 
 ### Phase 1: Pre-Release Checks
+
 - Verify all tests pass
 - Check for uncommitted changes
 - Validate changelog entries
@@ -28,15 +30,17 @@ Orchestrate the complete release preparation process including changelog finaliz
 - Review breaking changes
 
 ### Phase 2: Version Management
+
 - Calculate new version number
 - Update version in all relevant files:
-  - package.json
-  - setup.py / pyproject.toml
-  - VERSION file
-  - Source code constants
+    - package.json
+    - setup.py / pyproject.toml
+    - VERSION file
+    - Source code constants
 - Update changelog headers
 
 ### Phase 3: Documentation Finalization
+
 - Move "Unreleased" changes to versioned section
 - Generate release summary
 - Create migration guide (if breaking changes)
@@ -44,6 +48,7 @@ Orchestrate the complete release preparation process including changelog finaliz
 - Update comparison links
 
 ### Phase 4: Release Artifacts
+
 - Create git commit for release
 - Generate git tag
 - Create release branch (if applicable)
@@ -51,6 +56,7 @@ Orchestrate the complete release preparation process including changelog finaliz
 - Generate release notes for platforms
 
 ### Phase 5: Post-Release Setup
+
 - Create new "Unreleased" section
 - Set up next development cycle
 - Generate release checklist
@@ -130,6 +136,7 @@ Claude: 📄 Release Changes Preview:
 ```
 
 **RELEASE_NOTES.md excerpt:**
+
 ```markdown
 ## Version 2.4.0 - November 13, 2025
 
@@ -140,6 +147,7 @@ Claude: 📄 Release Changes Preview:
 ```
 
 **Files to be modified:**
+
 - CHANGELOG.md
 - RELEASE_NOTES.md
 - package.json
@@ -167,31 +175,38 @@ Claude: 🎯 Executing release...
 📢 Announcement template saved to: RELEASE_ANNOUNCEMENT.md
 
 🎉 Release v2.4.0 prepared successfully!
+
 ```
 
 ## Version Strategies
 
 ### Semantic Versioning
 ```
+
 MAJOR.MINOR.PATCH
 
 - MAJOR: Breaking changes
 - MINOR: New features, backwards compatible
 - PATCH: Bug fixes, backwards compatible
+
 ```
 
 ### Pre-releases
 ```
-v2.4.0-rc.1   # Release candidate
+
+v2.4.0-rc.1 # Release candidate
 v2.4.0-beta.2 # Beta version
 v2.4.0-alpha.3 # Alpha version
+
 ```
 
 ### Calendar Versioning
 ```
-2025.11.13    # Year.Month.Day
-2025.11       # Year.Month
-25.11.1       # YY.MM.Patch
+
+2025.11.13 # Year.Month.Day
+2025.11 # Year.Month
+25.11.1 # YY.MM.Patch
+
 ```
 
 ## Platform Integration
@@ -203,12 +218,14 @@ v2.4.0-alpha.3 # Alpha version
 ```
 
 ### GitLab Release
+
 ```bash
 # Generates GitLab release format
 /changelog-release --platform gitlab
 ```
 
 ### npm Publication
+
 ```bash
 # Prepares for npm publish
 /changelog-release --platform npm
@@ -249,6 +266,7 @@ release:
 ## Automation Hooks
 
 ### Pre-release Hook
+
 ```bash
 #!/bin/bash
 # .changelog-hooks/pre-release.sh
@@ -258,6 +276,7 @@ npm run lint
 ```
 
 ### Post-release Hook
+
 ```bash
 #!/bin/bash
 # .changelog-hooks/post-release.sh

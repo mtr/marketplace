@@ -21,15 +21,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Git tag and release branch creation
   - Platform-specific release note generation
 - Three specialized AI agents for intelligent processing:
-  - **git-history-analyzer**: Examines commit history using Claude 3.5 Sonnet
+  - **git-history-analyzer**: Examines commit history using Claude 4.5 Sonnet
     - Groups commits by PR, feature branch, and semantic similarity
     - Detects breaking changes and version patterns
     - Supports monorepo structures
-  - **commit-analyst**: Deep analysis using Claude 3 Haiku for efficiency
+  - **commit-analyst**: Deep analysis using Claude 4.5 Haiku for efficiency
     - Understands vague commit messages through diff analysis
     - Identifies hidden breaking changes
     - Extracts semantic meaning from code changes
-  - **changelog-synthesizer**: Generates final documentation using Claude 3.5 Sonnet
+  - **changelog-synthesizer**: Generates final documentation using Claude 4.5 Sonnet
     - Creates audience-appropriate content
     - Manages version continuity
     - Ensures format compliance

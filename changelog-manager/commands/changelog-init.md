@@ -5,7 +5,8 @@ aliases: ["cl-init"]
 
 # changelog-init
 
-Initialize changelog documentation for a project by analyzing entire git history and generating both developer and user-facing documentation files.
+Initialize changelog documentation for a project by analyzing entire git history
+and generating both developer and user-facing documentation files.
 
 ## Usage
 
@@ -19,18 +20,21 @@ Initialize changelog documentation for a project by analyzing entire git history
 ## Workflow
 
 ### Step 1: Project Analysis
+
 - Detects existing version files (package.json, setup.py, etc.)
 - Identifies versioning scheme in use
 - Analyzes git tag patterns
 - Detects commit message conventions
 
 ### Step 2: History Processing
+
 - Extracts all commits from starting point
 - Groups by releases (if tags exist)
 - Categorizes changes
 - Identifies key milestones
 
 ### Step 3: File Generation
+
 - Creates CHANGELOG.md with complete history
 - Creates RELEASE_NOTES.md with major highlights
 - Generates .changelog.yaml configuration
@@ -47,6 +51,7 @@ Initialize changelog documentation for a project by analyzing entire git history
 ## Examples
 
 ### New Project Setup
+
 ```bash
 You: /changelog-init --empty
 
@@ -64,6 +69,7 @@ Your changelog files are ready! Next steps:
 ```
 
 ### Retroactive Generation
+
 ```bash
 You: /changelog-init --from-beginning
 
@@ -90,6 +96,7 @@ Notable milestones detected:
 ## Generated Files
 
 ### CHANGELOG.md Template
+
 ```markdown
 # Changelog
 All notable changes to this project will be documented in this file.
@@ -114,6 +121,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ```
 
 ### Configuration File
+
 ```yaml
 # .changelog.yaml
 changelog:
@@ -144,6 +152,7 @@ versioning:
 ## Integration
 
 This command works with:
+
 - `/changelog update` - Add new changes
 - `/changelog release` - Prepare releases
 - Git hooks - Automate updates

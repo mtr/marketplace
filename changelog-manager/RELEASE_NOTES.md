@@ -103,7 +103,7 @@ Customize the plugin to match your workflow with a simple YAML configuration fil
 ### 🤝 Support
 
 Having issues or questions?
-- 📧 Email: martin@zemantiq.com
+- 📧 Email: ranang+marketplace@gmail.com
 - 🐛 Issues: [GitHub Issues](https://github.com/mtr/marketplace/changelog-manager/issues)
 - 💬 Discussions: [GitHub Discussions](https://github.com/mtr/marketplace/changelog-manager/discussions)
 

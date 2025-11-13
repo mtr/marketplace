@@ -70,7 +70,7 @@ release_notes:
     deprecated: "📝"
   
   # Maximum entries per category (0 = unlimited)
-  max_entries: 5
+  max_entries: 0
   
   # Highlight threshold (changes with this many files get highlighted)
   highlight_threshold: 20
@@ -258,7 +258,7 @@ advanced:
   parallel_processing: true
   
   # Number of workers for parallel processing
-  workers: 4
+  workers: 5
   
   # Memory limit per worker (MB)
   memory_limit: 512

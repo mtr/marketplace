@@ -1,79 +1,90 @@
 ---
 description: Initialize or update CHANGELOG.md and RELEASE_NOTES.md from git history
-aliases: ["cl", "change", "release"]
+aliases: [ "cl", "change", "release" ]
 ---
 
 # changelog
 
-Intelligent management of CHANGELOG.md and RELEASE_NOTES.md files through AI-powered git history analysis.
+Intelligent management of CHANGELOG.md and RELEASE_NOTES.md files through
+AI-powered git history analysis.
 
 ## Overview
 
-The `/changelog` command provides a comprehensive workflow for maintaining both developer-focused changelogs and user-facing release notes. It analyzes git commits, groups related changes, and generates appropriate documentation for different audiences.
+The `/changelog` command provides a comprehensive workflow for maintaining both
+developer-focused changelogs and user-facing release notes. It analyzes git
+commits, groups related changes, and generates appropriate documentation for
+different audiences.
 
 ## Usage
 
 ```bash
-/changelog                    # Interactive mode - guides you through the process
-/changelog init              # Initialize both files for the first time
-/changelog update            # Update files with changes since last update
-/changelog review            # Review and refine existing entries
+/changelog # Interactive mode - guides you through the process
+/changelog init # Initialize both files for the first time
+/changelog update # Update files with changes since last update
+/changelog review # Review and refine existing entries
 /changelog release [version] # Prepare a new release with version bump
 ```
 
 ## Workflow Phases
 
 ### Phase 1: Discovery & Analysis
+
 - Detects existing CHANGELOG.md and RELEASE_NOTES.md files
 - Identifies last update timestamp from file metadata
 - Analyzes repository structure and conventions
 - Determines version numbering scheme
 
 ### Phase 2: Git History Analysis
+
 - Collects commits since last update (or all if initializing)
 - Groups commits by:
-  - Feature branches
-  - Pull requests
-  - Time proximity
-  - Semantic similarity
+    - Feature branches
+    - Pull requests
+    - Time proximity
+    - Semantic similarity
 - Identifies breaking changes, features, fixes, and improvements
 
 ### Phase 3: Commit Understanding
+
 - For complex or unclear commits:
-  - Analyzes code diffs with AI (Haiku model for efficiency)
-  - Extracts semantic meaning from changes
-  - Correlates with issue tracker references
-  - Identifies user impact
+    - Analyzes code diffs with AI (Haiku model for efficiency)
+    - Extracts semantic meaning from changes
+    - Correlates with issue tracker references
+    - Identifies user impact
 
 ### Phase 4: Change Categorization
+
 - Organizes changes following Keep a Changelog convention:
-  - Added: New features
-  - Changed: Changes in existing functionality
-  - Deprecated: Soon-to-be removed features
-  - Removed: Removed features
-  - Fixed: Bug fixes
-  - Security: Security-related changes
+    - Added: New features
+    - Changed: Changes in existing functionality
+    - Deprecated: Soon-to-be removed features
+    - Removed: Removed features
+    - Fixed: Bug fixes
+    - Security: Security-related changes
 
 ### Phase 5: Documentation Generation
+
 - Creates technical entries for CHANGELOG.md:
-  - Comprehensive listing of all changes
-  - Technical details and implementation notes
-  - References to PRs, issues, and commits
-  - Breaking change warnings
-  
+    - Comprehensive listing of all changes
+    - Technical details and implementation notes
+    - References to PRs, issues, and commits
+    - Breaking change warnings
+
 - Creates user-focused entries for RELEASE_NOTES.md:
-  - High-level feature descriptions
-  - User benefits and value propositions
-  - Migration guides for breaking changes
-  - Screenshots/examples where applicable
+    - High-level feature descriptions
+    - User benefits and value propositions
+    - Migration guides for breaking changes
+    - Screenshots/examples where applicable
 
 ### Phase 6: Review & Refinement
+
 - Presents generated content for review
 - Allows interactive editing and refinement
 - Validates version numbering (semantic versioning)
 - Checks for consistency and completeness
 
 ### Phase 7: Finalization
+
 - Writes updated files with proper formatting
 - Creates git commit for documentation updates
 - Tags release if version specified
@@ -183,19 +194,19 @@ Create `.changelog.yaml` in your repository root to customize behavior:
 changelog:
   # Use conventional commits for automatic categorization
   conventional_commits: true
-  
+
   # Include commit hashes in CHANGELOG.md
   include_commit_hash: true
-  
+
   # Include author attribution
   include_authors: true
-  
+
   # Group commits by these criteria
   grouping:
     - pull_request
     - feature_branch
     - semantic_similarity
-  
+
   # Categories to use (Keep a Changelog format)
   categories:
     - Added
@@ -204,7 +215,7 @@ changelog:
     - Removed
     - Fixed
     - Security
-  
+
   # Breaking change indicators
   breaking_indicators:
     - "BREAKING CHANGE:"
@@ -215,16 +226,16 @@ changelog:
 release_notes:
   # Target audience
   audience: "end-users" # or "developers", "stakeholders"
-  
+
   # Tone
   tone: "professional" # or "casual", "technical"
-  
+
   # Include screenshots/gifs
   include_visuals: false
-  
+
   # Emoji usage
   use_emoji: true
-  
+
   # Maximum entries per category
   max_entries: 5
 
@@ -232,7 +243,7 @@ release_notes:
 versioning:
   # Semantic versioning strategy
   strategy: "semver" # or "calver", "custom"
-  
+
   # Auto-bump rules
   auto_bump:
     breaking: "major"
@@ -243,13 +254,13 @@ versioning:
 ai_analysis:
   # Model for commit analysis
   model: "claude-3-haiku" # Fast and efficient for code analysis
-  
+
   # Analyze commits with unclear messages
   analyze_unclear: true
-  
+
   # Analyze large diffs for better understanding
   analyze_large_diffs: true
-  
+
   # Threshold for "large" diff (lines changed)
   large_diff_threshold: 100
 ```
@@ -260,15 +271,19 @@ This command coordinates multiple specialized agents:
 
 - **git-history-analyzer**: Examines commit history and groups related changes
 - **commit-analyst**: Uses AI to understand complex commits and code changes
-- **changelog-synthesizer**: Combines information to generate both technical and user-facing documentation
+- **changelog-synthesizer**: Combines information to generate both technical and
+  user-facing documentation
 
 ## Best Practices
 
-1. **Regular Updates**: Run `/changelog update` frequently (e.g., weekly) to avoid large batches
+1. **Regular Updates**: Run `/changelog update` frequently (e.g., weekly) to
+   avoid large batches
 2. **Review Generated Content**: Always review AI-generated entries for accuracy
-3. **Maintain Consistency**: Use the same categorization and format across releases
+3. **Maintain Consistency**: Use the same categorization and format across
+   releases
 4. **Version Strategically**: Follow semantic versioning for clear communication
-5. **Separate Audiences**: Keep technical details in CHANGELOG.md, user value in RELEASE_NOTES.md
+5. **Separate Audiences**: Keep technical details in CHANGELOG.md, user value in
+   RELEASE_NOTES.md
 
 ## Tips
 

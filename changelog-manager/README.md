@@ -128,21 +128,21 @@ The plugin employs three specialized AI agents:
 
 ### Git History Analyzer
 
-- **Model**: Claude 3.5 Sonnet
+- **Model**: Claude 4.5 Sonnet
 - **Purpose**: Analyzes commit history, groups related changes, detects patterns
 - **Capabilities**: Branch analysis, PR correlation, semantic clustering,
   version detection
 
 ### Commit Analyst
 
-- **Model**: Claude 3 Haiku (optimized for speed)
+- **Model**: Claude 4.5 Haiku (optimized for speed)
 - **Purpose**: Deep analysis of individual commits and code diffs
 - **Capabilities**: Diff interpretation, impact assessment, purpose extraction,
   breaking change detection
 
 ### Changelog Synthesizer
 
-- **Model**: Claude 3.5 Sonnet
+- **Model**: Claude 4.5 Sonnet
 - **Purpose**: Combines information to generate final documentation
 - **Capabilities**: Audience adaptation, format compliance, version management,
   content curation
