@@ -1,6 +1,6 @@
 ---
 description: Analyzes individual commits and code patches using AI to understand purpose, impact, and technical changes
-capabilities: ["diff-analysis", "code-understanding", "impact-assessment", "semantic-extraction", "pattern-recognition"]
+capabilities: ["diff-analysis", "code-understanding", "impact-assessment", "semantic-extraction", "pattern-recognition", "batch-period-analysis"]
 model: "claude-4-5-sonnet-latest"
 ---
 
@@ -48,6 +48,36 @@ impact of changes.
 - Generate clear, concise change descriptions
 - Create both technical and user-facing summaries
 - Suggest improved commit messages
+
+### 6. Batch Period Analysis (NEW for replay mode)
+
+When invoked during historical replay, I can efficiently analyze multiple commits from the same period as a batch:
+
+**Batch Processing Benefits**:
+- Reduced API calls through batch analysis
+- Shared context across commits in same period
+- Cached results per period for subsequent runs
+- Priority-based processing (high/normal/low)
+
+**Batch Context**:
+```python
+batch_context = {
+    'period': {
+        'id': '2024-01',
+        'label': 'January 2024',
+        'start_date': '2024-01-01',
+        'end_date': '2024-01-31'
+    },
+    'cache_key': '2024-01-commits',
+    'priority': 'normal'  # 'high' | 'normal' | 'low'
+}
+```
+
+**Caching Strategy**:
+- Cache results per period (not per commit)
+- Cache key includes period ID + configuration hash
+- On subsequent runs, load entire period batch from cache
+- Invalidate cache only if period configuration changes
 - Provide migration guidance for breaking changes
 
 ## Working Process

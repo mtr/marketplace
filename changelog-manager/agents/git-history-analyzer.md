@@ -1,6 +1,6 @@
 ---
 description: Analyzes git commit history to extract, group, and categorize changes for changelog generation
-capabilities: ["git-analysis", "commit-grouping", "version-detection", "branch-analysis", "pr-correlation"]
+capabilities: ["git-analysis", "commit-grouping", "version-detection", "branch-analysis", "pr-correlation", "period-scoped-extraction"]
 model: "claude-4-5-sonnet-latest"
 ---
 
@@ -95,14 +95,56 @@ git branch -r --merged
 ### Phase 2: Commit Extraction
 
 ```bash
-# Extract commits since last changelog update
+# Standard mode: Extract commits since last changelog update
 git log --since="2025-11-01" --format="%H|%ai|%an|%s|%b"
 
 # Or since last tag
 git log v2.3.1..HEAD --format="%H|%ai|%an|%s|%b"
 
+# Replay mode: Extract commits for specific period (period-scoped extraction)
+# Uses commit range from period boundaries
+git log abc123def..ghi789jkl --format="%H|%ai|%an|%s|%b"
+
+# With date filtering for extra safety
+git log --since="2024-01-01" --until="2024-01-31" --format="%H|%ai|%an|%s|%b"
+
 # Include PR information if available
 git log --format="%H|%s|%(trailers:key=Closes,valueonly)"
+```
+
+**Period-Scoped Extraction** (NEW for replay mode):
+
+When invoked by the period-coordinator agent with a `period_context` parameter, I scope my analysis to only commits within that period's boundaries:
+
+```python
+def extract_commits_for_period(period_context):
+    """
+    Extract commits within period boundaries.
+
+    Period context includes:
+    - start_commit: First commit hash in period
+    - end_commit: Last commit hash in period
+    - start_date: Period start date
+    - end_date: Period end date
+    - boundary_handling: "inclusive_start" | "exclusive_end"
+    """
+    # Primary method: Use commit range
+    commit_range = f"{period_context.start_commit}..{period_context.end_commit}"
+    commits = git_log(commit_range)
+
+    # Secondary validation: Filter by date
+    # (Handles edge cases where commit graph is complex)
+    commits = [c for c in commits
+               if period_context.start_date <= c.date < period_context.end_date]
+
+    # Handle boundary commits based on policy
+    if period_context.boundary_handling == "inclusive_start":
+        # Include commits exactly on start_date, exclude on end_date
+        commits = [c for c in commits
+                   if c.date >= period_context.start_date
+                   and c.date < period_context.end_date]
+
+    return commits
 ```
 
 ### Phase 3: Intelligent Grouping
@@ -192,6 +234,8 @@ Patch (x.y.Z): Bug fixes, backwards compatible
 
 I provide structured data for the changelog-synthesizer agent:
 
+### Standard Mode Output
+
 ```json
 {
   "metadata": {
@@ -216,6 +260,61 @@ I provide structured data for the changelog-synthesizer agent:
         "impact": "high",
         "files_changed": 15,
         "technical_notes": "Implements cursor-based pagination"
+      }
+    ],
+    "changed": [...],
+    "fixed": [...],
+    "security": [...]
+  },
+  "statistics": {
+    "contributors": 8,
+    "files_changed": 142,
+    "lines_added": 3421,
+    "lines_removed": 1876
+  }
+}
+```
+
+### Replay Mode Output (with period context)
+
+```json
+{
+  "metadata": {
+    "repository": "user/repo",
+    "current_version": "2.3.1",
+    "suggested_version": "2.4.0",
+    "commit_range": "abc123def..ghi789jkl",
+
+    "period_context": {
+      "period_id": "2024-01",
+      "period_label": "January 2024",
+      "period_type": "time_period",
+      "start_date": "2024-01-01T00:00:00Z",
+      "end_date": "2024-01-31T23:59:59Z",
+      "start_commit": "abc123def",
+      "end_commit": "ghi789jkl",
+      "tag": "v1.2.0",
+      "boundary_handling": "inclusive_start"
+    },
+
+    "total_commits": 45,
+    "date_range": {
+      "from": "2024-01-01T10:23:15Z",
+      "to": "2024-01-31T18:45:32Z"
+    }
+  },
+  "changes": {
+    "breaking": [],
+    "added": [
+      {
+        "summary": "REST API v2 with pagination support",
+        "commits": ["abc123", "def456"],
+        "pr_number": 234,
+        "author": "@dev1",
+        "impact": "high",
+        "files_changed": 15,
+        "technical_notes": "Implements cursor-based pagination",
+        "period_note": "Released in January 2024 as v1.2.0"
       }
     ],
     "changed": [...],
@@ -311,3 +410,37 @@ I should be invoked when:
 - Preparing for a release
 - Auditing project history
 - Generating release statistics
+
+**NEW: Replay Mode Invocation**
+
+When invoked by the period-coordinator agent during historical replay:
+
+1. Receive `period_context` parameter with period boundaries
+2. Extract commits only within that period (period-scoped extraction)
+3. Perform standard grouping and categorization on period commits
+4. Return results tagged with period information
+5. Period coordinator caches results per period
+
+**Example Replay Invocation**:
+```python
+# Period coordinator invokes me once per period
+invoke_git_history_analyzer({
+    'period_context': {
+        'period_id': '2024-01',
+        'period_label': 'January 2024',
+        'start_commit': 'abc123def',
+        'end_commit': 'ghi789jkl',
+        'start_date': '2024-01-01T00:00:00Z',
+        'end_date': '2024-01-31T23:59:59Z',
+        'tag': 'v1.2.0',
+        'boundary_handling': 'inclusive_start'
+    },
+    'commit_range': 'abc123def..ghi789jkl'
+})
+```
+
+**Key Differences in Replay Mode**:
+- Scoped extraction: Only commits in period
+- Period metadata included in output
+- No cross-period grouping (each period independent)
+- Results cached per period for performance

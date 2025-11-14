@@ -26,6 +26,8 @@ changes at a semantic level.
   breaking changes
 - 🌍 **Multi-language Support**: Understands commits and code in multiple
   programming languages
+- ⏱️ **Historical Replay Mode** (NEW): Generate changelogs with period-based granularity (daily/weekly/monthly/by-release)
+  as if they were updated in real-time throughout development history
 
 ## Installation
 
@@ -61,6 +63,9 @@ git clone https://github.com/mtr/marketplace/changelog-manager.git ~/.claude/plu
 
 # Or analyze entire git history
 /changelog-init --from-beginning
+
+# Or use historical replay mode (generates period-based changelog)
+/changelog-init --replay
 ```
 
 ### Update Existing Changelogs
@@ -109,7 +114,18 @@ history.
 /changelog-init --empty # Create templates
 /changelog-init --from-beginning # Analyze all history
 /changelog-init --from-tag v1.0.0 # Start from specific version
+
+# Historical Replay Mode (NEW)
+/changelog-init --replay # Interactive period-based replay
+/changelog-init --replay --period weekly # Weekly periods
+/changelog-init --replay --period monthly # Monthly periods
+/changelog-init --replay --period by-release # Group by releases
+/changelog-init --replay --period auto # Auto-detect best strategy
 ```
+
+**Replay Mode**: Generates changelogs by "replaying" history through time periods
+(daily/weekly/monthly/by-release), creating entries as if updated in real-time. Perfect
+for retroactive changelog generation with period-based organization.
 
 ### `/changelog-release`
 
@@ -126,28 +142,46 @@ artifacts.
 
 ## Agents
 
-The plugin employs three specialized AI agents:
+The plugin employs specialized AI agents for different capabilities:
 
-### Git History Analyzer
+### Core Agents
+
+#### Git History Analyzer
 
 - **Model**: Claude 4.5 Sonnet
 - **Purpose**: Analyzes commit history, groups related changes, detects patterns
 - **Capabilities**: Branch analysis, PR correlation, semantic clustering,
-  version detection
+  version detection, period-scoped extraction
 
-### Commit Analyst
+#### Commit Analyst
 
-- **Model**: Claude 4.5 Sonnet (optimized for accuracy)
+- **Model**: Claude 4.5 Haiku (optimized for efficiency)
 - **Purpose**: Deep analysis of individual commits and code diffs
 - **Capabilities**: Diff interpretation, impact assessment, purpose extraction,
-  breaking change detection
+  breaking change detection, batch period analysis
 
-### Changelog Synthesizer
+#### Changelog Synthesizer
 
 - **Model**: Claude 4.5 Sonnet
 - **Purpose**: Combines information to generate final documentation
 - **Capabilities**: Audience adaptation, format compliance, version management,
-  content curation
+  content curation, multi-period synthesis
+
+### Replay Mode Agents (NEW)
+
+#### Period Detector
+
+- **Model**: Claude 4.5 Haiku (cost-optimized)
+- **Purpose**: Fast period boundary calculation and release detection
+- **Capabilities**: Auto-detect optimal period strategy, calculate calendar-aligned
+  boundaries, identify releases, handle edge cases
+
+#### Period Coordinator
+
+- **Model**: Claude 4.5 Sonnet
+- **Purpose**: Orchestrates multi-period workflow with parallel execution
+- **Capabilities**: Batch processing, cache management, progress tracking,
+  result aggregation, conflict resolution
 
 ## Configuration
 
@@ -238,6 +272,219 @@ git push origin main --tags
 # Review generated history
 # Refine major milestones
 # Commit the new files
+```
+
+## Historical Replay Mode
+
+The replay feature generates changelogs by "replaying" your project's development history through time periods, creating changelog entries as if they were updated in real-time during each period. This is ideal for:
+
+- **Retroactive changelog generation** with period-based organization
+- **Long project histories** where a single flat changelog is overwhelming
+- **Understanding project evolution** through temporal granularity
+- **Release-based documentation** showing what changed between versions
+
+### How It Works
+
+1. **Period Detection** (Claude Haiku): Analyzes repository structure, commit frequency, and release tags to recommend optimal period strategy
+2. **Boundary Calculation** (Claude Haiku): Calculates precise period boundaries with calendar alignment
+3. **Parallel Analysis** (Claude Sonnet): Processes multiple periods concurrently (3 workers by default)
+4. **Changelog Synthesis** (Claude Sonnet): Generates hybrid-format CHANGELOG.md with version sections containing period subsections
+
+### Quick Start
+
+```bash
+# Interactive mode with auto-detection
+/changelog-init --replay
+
+# Specify period strategy
+/changelog-init --replay --period weekly
+/changelog-init --replay --period monthly
+/changelog-init --replay --period by-release
+
+# With custom workers for faster processing
+/changelog-init --replay --period monthly --max-workers 5
+```
+
+### Example: Auto-Detection Workflow
+
+```bash
+You: /changelog-init --replay
+
+Claude: 🔍 Analyzing repository for replay...
+
+Repository analysis:
+- Total commits: 523
+- First commit: 2023-03-15 (619 days ago)
+- Releases: 12 tagged versions
+- Contributors: 24
+- Commit frequency: 21.4 commits/week
+
+Auto-detection results:
+✅ Recommended strategy: weekly
+   Rationale: Consistent activity (15-30 commits/week)
+
+Alternative strategies:
+- Monthly: 20 periods, ~26 commits/period
+- By-Release: 12 periods, ~44 commits/period
+
+Use recommended strategy? [Y/n]: Y
+
+📅 Calculating 74 weekly periods...
+- Active periods: 63
+- Empty periods (skipped): 8
+- Merge-only periods (skipped): 3
+
+⚙️ Executing parallel analysis (3 workers)...
+[Progress] 63/63 periods analyzed - 100% - 3m 42s
+
+✅ Generated CHANGELOG.md (1,847 lines, hybrid format)
+✅ Generated RELEASE_NOTES.md (423 lines, period-aware)
+✅ Configuration saved to .changelog.yaml
+✅ Cache created: .changelog-cache/ (63 period analyses)
+```
+
+### Hybrid Format Output
+
+The replay mode generates a hybrid-format CHANGELOG.md that combines version releases with period subsections:
+
+```markdown
+# Changelog
+
+## [Unreleased]
+
+### Week of November 11, 2025
+
+#### Added
+- Real-time notification system (#256)
+- Advanced search filters (#252)
+
+## [2.1.0] - 2024-10-27
+
+### Week of October 21, 2024
+
+#### Added
+- REST API v2 with pagination (#234)
+  - Backward compatible with v1
+
+#### Changed
+- **BREAKING:** JWT authentication
+
+### Week of October 14, 2024
+
+#### Fixed
+- Race condition in file uploads (#245)
+
+## [2.0.0] - 2024-09-30
+
+### Month of September 2024
+
+#### Added
+- Complete UI redesign (#210)
+- Dark mode support (#215)
+
+#### Removed
+- Python 3.7 support
+```
+
+### Period Strategies
+
+| Strategy | Best For | Example Periods |
+|----------|----------|-----------------|
+| **daily** | Very active projects (5+ commits/day) | 2025-11-14, 2025-11-15 |
+| **weekly** | Regular activity (15-30 commits/week) | Week of Nov 11, Week of Nov 4 |
+| **monthly** | Moderate activity (20-40 commits/month) | November 2025, October 2025 |
+| **quarterly** | Slow-moving projects (<20 commits/month) | Q4 2025, Q3 2025 |
+| **by-release** | Tag-driven workflows | v2.1.0, v2.0.0, v1.5.0 |
+| **auto** | Unknown - lets AI decide | Analyzes and recommends best fit |
+
+### Configuration
+
+Add replay settings to `.changelog.yaml`:
+
+```yaml
+replay:
+  enabled: false
+  default_strategy: "auto"  # auto | weekly | monthly | by-release
+
+  auto_detection:
+    min_releases_for_release_strategy: 3
+    min_months_for_monthly_strategy: 6
+    daily_if_commits_per_day_exceed: 5
+    weekly_if_commits_per_week_exceed: 20
+
+  calendar:
+    week_start: "monday"
+    use_calendar_months: true
+
+  boundaries:
+    boundary_handling: "inclusive_start"  # Include commits on start date
+    unreleased_handling: "include"  # Partial final period → [Unreleased]
+
+  filters:
+    min_commits: 1
+    skip_merge_only_periods: true
+
+  output:
+    hybrid_format: true
+    include_period_headers: true
+    period_header_format: "### {period_label}"
+    replay_in_release_notes: true
+
+  performance:
+    enable_parallel: true
+    max_concurrent_periods: 3  # 1-5 workers
+    enable_cache: true
+    cache_ttl_days: 0  # Never expire
+```
+
+### Performance
+
+| Repository Size | Period Strategy | Periods | Workers | Estimated Time |
+|----------------|-----------------|---------|---------|----------------|
+| Small (100 commits) | Weekly | 15 | 3 | ~45 seconds |
+| Medium (500 commits) | Weekly | 60 | 3 | ~4 minutes |
+| Large (2000 commits) | Monthly | 36 | 3 | ~6 minutes |
+| Large (2000 commits) | Monthly | 36 | 5 | ~4 minutes |
+| Very Large (10k commits) | Quarterly | 20 | 5 | ~8 minutes |
+
+**Optimization Tips:**
+- Use caching (enabled by default) for instant regeneration
+- Increase workers (up to 5) for faster processing
+- Choose coarser periods (monthly vs weekly) for large histories
+- First run is slower; subsequent runs use cached period analyses
+
+### Edge Cases Handled
+
+- **Empty Periods**: Automatically skipped (no changelog entry)
+- **Merge-Only Periods**: Automatically skipped (configurable)
+- **First Period with 100+ Commits**: Summarized instead of listing every commit
+- **Partial Final Period**: Moved to [Unreleased] section
+- **Multiple Tags in One Period**: Uses highest version number
+- **Pre-Release Tags**: Separate entries (v2.0.0-beta, v2.0.0-rc1, v2.0.0)
+
+### Advanced Usage
+
+#### Regenerate Specific Period
+
+```bash
+/changelog-init --replay-period "2024-Q3" --force
+```
+
+#### Custom Worker Count
+
+```bash
+# Faster processing with more parallelism
+/changelog-init --replay --period weekly --max-workers 5
+
+# Conservative (low memory)
+/changelog-init --replay --period monthly --max-workers 1
+```
+
+#### Disable Caching
+
+```bash
+# Force fresh analysis (slower)
+/changelog-init --replay --period weekly --no-cache
 ```
 
 ## Best Practices
@@ -434,9 +681,18 @@ Enable verbose output for troubleshooting:
 
 - **Large Repositories**: The plugin handles repos with 10,000+ commits
   efficiently
-- **Token Usage**: Sonnet model provides comprehensive analysis for commit understanding
-- **Caching**: Results are cached to avoid redundant analysis
+- **Token Usage**: Strategically uses Haiku (cost-optimized) for repetitive tasks
+  and Sonnet (high-accuracy) for complex reasoning
+- **Caching**: Results are cached to avoid redundant analysis; replay mode caches
+  per-period for instant regeneration
 - **Batch Processing**: Commits are analyzed in optimized batches
+- **Parallel Execution** (Replay Mode): Processes multiple periods concurrently
+  (3-5 workers) for faster large-scale analysis
+- **Estimated Times** (Replay Mode):
+  - Small repos (100 commits): ~45 seconds
+  - Medium repos (500 commits): ~4 minutes
+  - Large repos (2000 commits): ~6 minutes (3 workers) or ~4 minutes (5 workers)
+  - Very large repos (10k commits): ~8 minutes with quarterly periods
 
 ## Privacy & Security
 

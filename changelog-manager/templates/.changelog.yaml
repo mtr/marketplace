@@ -78,6 +78,175 @@ release_notes:
   # Include "Coming Soon" section
   include_upcoming: true
 
+# Historical Replay Configuration (for /changelog-init --replay)
+replay:
+  # Enable replay mode by default for changelog initialization
+  enabled: false
+
+  # Default period grouping strategy
+  # Options: "daily", "weekly", "monthly", "quarterly", "annual", "by-release", "auto"
+  default_strategy: "auto"
+
+  # Auto-detection thresholds (when strategy is "auto")
+  auto_detection:
+    # Use release-based strategy if repository has this many or more releases
+    min_releases_for_release_strategy: 3
+
+    # Use monthly strategy if project age exceeds this many months
+    min_months_for_monthly_strategy: 6
+
+    # Use daily strategy if average commits per day exceeds this threshold
+    daily_if_commits_per_day_exceed: 5
+
+    # Use weekly strategy if average commits per week exceeds this threshold
+    weekly_if_commits_per_week_exceed: 20
+
+    # Default to quarterly for very long histories (in months)
+    long_history_threshold_months: 24
+
+  # Calendar alignment settings
+  calendar:
+    # Align periods to calendar boundaries
+    align_to_calendar: true
+
+    # Week starts on (ISO 8601 standard)
+    week_start: "monday"  # Options: "monday", "sunday"
+
+    # Use calendar months (Jan 1-31) vs rolling 30-day periods
+    use_calendar_months: true
+
+    # Fiscal year start month (0 = January, 3 = April, etc.)
+    fiscal_year_start_month: 0
+
+  # Period boundary handling
+  boundaries:
+    # How to handle commits on exact boundary dates
+    # "inclusive_start": Include in earlier period
+    # "exclusive_end": Include in later period
+    # "both": Duplicate in both periods with notes
+    boundary_handling: "inclusive_start"
+
+    # How to handle unreleased commits (after last complete period)
+    # "include": Add to [Unreleased] section
+    # "exclude": Omit from changelog
+    # "separate_section": Create dedicated section
+    unreleased_handling: "include"
+
+  # Period filtering options
+  filters:
+    # Minimum commits per period to include (periods with fewer commits are skipped)
+    min_commits: 1
+
+    # Skip periods containing only merge commits
+    skip_merge_only_periods: true
+
+    # Maximum periods to process (0 = unlimited)
+    # Useful for testing or limiting analysis scope
+    max_periods: 0
+
+    # Start analysis from specific date (YYYY-MM-DD format)
+    # null = start from first commit
+    start_date: null
+
+    # End analysis at specific date (YYYY-MM-DD format)
+    # null = analyze until HEAD
+    end_date: null
+
+    # Include only periods matching git tag pattern (regex)
+    # null = include all periods
+    tag_pattern: null  # Example: "v*", "release-*"
+
+  # Output format preferences
+  output:
+    # Generate hybrid format (version sections + time periods)
+    # true: ## [v2.0.0] - 2024-10-15
+    #       ### Week of October 14
+    #       ### Week of October 7
+    # false: Standard Keep a Changelog format
+    hybrid_format: true
+
+    # Include period headers in CHANGELOG.md
+    include_period_headers: true
+
+    # Template for period headers
+    # Available variables: {period_label}, {start_date}, {end_date}, {commit_count}
+    period_header_format: "### {period_label}"
+
+    # Generate separate period-specific release notes
+    generate_period_notes: false
+
+    # Include statistics per period
+    include_period_stats: true
+
+    # Include navigation/table of contents for long changelogs
+    include_navigation: true
+
+    # Apply replay structure to RELEASE_NOTES.md
+    # true: Include period summaries in release notes
+    # false: Standard consolidated release notes
+    replay_in_release_notes: true
+
+  # Performance and execution settings
+  performance:
+    # Enable parallel processing of periods
+    enable_parallel: true
+
+    # Maximum concurrent period analyses
+    # Higher values = faster but more API usage
+    # Recommended: 3 for balance of speed and cost
+    max_concurrent_periods: 3
+
+    # Batch size for commit analysis within each period
+    batch_size: 50
+
+    # Enable caching of period analysis results
+    enable_cache: true
+
+    # Cache time-to-live in days (0 = never expire)
+    cache_ttl_days: 0
+
+    # Cache storage location (relative to repository root)
+    cache_location: ".changelog-cache/"
+
+  # Edge case handling
+  edge_cases:
+    # Minimum commits to avoid "summary mode" for first period
+    # First periods with more commits use summarization
+    first_period_summary_threshold: 100
+
+    # How to handle periods with multiple version tags
+    # "highest": Use highest version number
+    # "latest": Use most recent by date
+    # "first": Use earliest by date
+    multiple_tags_strategy: "highest"
+
+    # How to handle gaps in commit history (months with no activity)
+    # "skip": Omit empty periods entirely
+    # "mark_as_inactive": Include with "No changes" note
+    # "merge_adjacent": Combine with adjacent periods
+    gap_handling: "skip"
+
+    # How to handle incomplete final period
+    # "include": Add to last completed period
+    # "unreleased": Move to [Unreleased] section
+    # "separate": Create partial period with note
+    incomplete_final_period: "unreleased"
+
+  # Regeneration settings
+  regeneration:
+    # Allow regenerating specific periods without full replay
+    # Example: /changelog-init --replay-period 2024-Q3
+    allow_partial_regeneration: true
+
+    # Preserve manual edits when regenerating
+    preserve_manual_edits: true
+
+    # Backup existing changelog before regeneration
+    create_backup: true
+
+    # Backup file naming pattern
+    backup_pattern: "CHANGELOG.{timestamp}.md.backup"
+
 # Version management
 versioning:
   # Versioning strategy
