@@ -211,9 +211,62 @@ monorepo:
 integrations:
   # GitHub integration
   github:
-    enabled: true
+    enabled: true  # Auto-enabled if GitHub remote detected and gh CLI available
     create_releases: false
     release_draft: true
+
+    # GitHub matching integration
+    matching:
+      enabled: true  # Match commits to issues/PRs/projects/milestones
+      cache_ttl_hours: 24  # Cache GitHub data for 24 hours
+      time_window_days: 14  # Match commits within ±14 days of artifact activity
+      confidence_threshold: 0.85  # Minimum confidence to include a match
+
+      # Artifact types to fetch and match
+      fetch:
+        issues: true
+        pull_requests: true
+        projects: true  # GitHub Projects V2
+        milestones: true
+
+      # Matching strategies (all enabled by default)
+      strategies:
+        explicit_reference: true  # Parse #123, fixes #456 from messages
+        timestamp_correlation: true  # Match by commit/artifact timestamps
+        semantic_similarity: true  # AI-powered semantic matching
+
+      # Composite scoring bonuses
+      scoring:
+        timestamp_and_semantic_bonus: 0.15  # +15% when both strategies match
+        timestamp_and_branch_bonus: 0.10  # +10% when timestamp + PR branch match
+        all_strategies_bonus: 0.20  # +20% when 3+ strategies align
+
+      # Semantic matching settings
+      semantic:
+        min_similarity_score: 0.40  # Minimum AI similarity (0.0-1.0)
+        context_length: 2000  # Chars to compare from issue/PR body
+
+    # Display preferences for GitHub references
+    references:
+      # CHANGELOG.md (technical documentation)
+      changelog:
+        include_references: true
+        format: "detailed"  # Options: "detailed", "inline", "minimal"
+        show_issue_refs: true
+        show_pr_refs: true
+        show_project_refs: true
+        show_milestone_refs: false
+        show_authors: true
+
+      # RELEASE_NOTES.md (user-facing documentation)
+      release_notes:
+        include_references: true
+        format: "minimal"  # Options: "detailed", "inline", "minimal", "none"
+        show_issue_refs: true
+        show_pr_refs: false
+        show_project_refs: false
+        show_milestone_refs: false
+        show_authors: false
     
   # GitLab integration
   gitlab:

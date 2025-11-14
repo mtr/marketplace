@@ -281,6 +281,94 @@ CATEGORY_TEMPLATES = {
 }
 ```
 
+### GitHub Reference Templates
+
+If GitHub integration is enabled, I include artifact references based on configuration:
+
+```python
+GITHUB_TEMPLATES = {
+    # CHANGELOG.md formats
+    'detailed': '[Closes: {issues} | PR: {prs} | Project: {projects} | Milestone: {milestone}]',
+    'inline': '[{issues}, PR {prs}]',
+    'minimal': '(#{pr})',
+
+    # RELEASE_NOTES.md formats
+    'user_minimal': '[#{issue}]',
+    'user_inline': '[related: {issues}]',
+    'none': ''
+}
+
+def format_github_refs(commit, config):
+    """
+    Format GitHub references based on config settings.
+    """
+    if not commit.get('github_refs'):
+        return ''
+
+    refs = commit['github_refs']
+    display_config = config['integrations']['github']['references']
+
+    # Choose format based on document type
+    if document_type == 'changelog':
+        settings = display_config['changelog']
+    else:  # release_notes
+        settings = display_config['release_notes']
+
+    if not settings['include_references']:
+        return ''
+
+    # Build reference string
+    parts = []
+
+    if settings['show_issue_refs'] and refs.get('issues'):
+        issue_nums = [f"#{i['number']}" for i in refs['issues']]
+        parts.append(f"Closes: {', '.join(issue_nums)}")
+
+    if settings['show_pr_refs'] and refs.get('pull_requests'):
+        pr_nums = [f"#{pr['number']}" for pr in refs['pull_requests']]
+        parts.append(f"PR: {', '.join(pr_nums)}")
+
+    if settings['show_project_refs'] and refs.get('projects'):
+        proj_names = [p['name'] for p in refs['projects']]
+        parts.append(f"Project: {', '.join(proj_names)}")
+
+    if settings['show_milestone_refs'] and refs.get('milestones'):
+        milestone = refs['milestones'][0]['title']
+        parts.append(f"Milestone: {milestone}")
+
+    if not parts:
+        return ''
+
+    # Format based on style
+    format_type = settings['format']
+    if format_type == 'detailed':
+        return f"  [{' | '.join(parts)}]"
+    elif format_type == 'inline':
+        return f" [{', '.join(parts)}]"
+    elif format_type == 'minimal':
+        # Just show first PR or issue
+        if refs.get('pull_requests'):
+            return f" (#{refs['pull_requests'][0]['number']})"
+        elif refs.get('issues'):
+            return f" (#{refs['issues'][0]['number']})"
+
+    return ''
+```
+
+**Example Output (CHANGELOG.md with detailed format)**:
+```markdown
+### Added
+- REST API v2 with pagination support (#234, @dev1)
+  [Closes: #189, #201 | PR: #234 | Project: Backend Roadmap | Milestone: v2.0.0]
+  - Implements cursor-based pagination
+```
+
+**Example Output (RELEASE_NOTES.md with minimal format)**:
+```markdown
+#### ✨ Real-Time Notifications [#189]
+Never miss important updates! We've added real-time notifications...
+```
+
 ## Quality Assurance
 
 ### Validation Checks

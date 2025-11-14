@@ -10,12 +10,14 @@ changes at a semantic level.
 
 - 🤖 **AI-Powered Commit Analysis**: Uses Claude 4.5 Sonnet to understand vague commit
   messages and complex code changes
+- 🔗 **GitHub Integration**: Automatically matches commits to Issues, PRs, Projects, and Milestones
+  using intelligent multi-strategy matching with confidence scoring
 - 📚 **Dual Documentation**: Generates both developer-focused changelogs and
   user-friendly release notes
 - 🔍 **Intelligent Grouping**: Automatically groups related commits by PR,
   feature branch, or semantic similarity
 - ⚡ **Efficient Processing**: Optimized for large repositories with extensive
-  commit history
+  commit history, with smart caching for GitHub data
 - 📋 **Standards Compliance**:
   Follows [Keep a Changelog](https://keepachangelog.com)
   and [Semantic Versioning](https://semver.org)
@@ -280,6 +282,83 @@ monorepo:
     - packages/cli
     - packages/ui
   independent_versioning: true
+```
+
+### GitHub Integration
+
+Automatically connect commits to GitHub artifacts for richer context:
+
+#### Features
+
+- **Intelligent Matching**: Links commits to Issues, Pull Requests, Projects V2, and Milestones
+- **Multiple Strategies**:
+  - Explicit references (`fixes #123`, `closes #456`)
+  - Timestamp correlation (±14 days accounting for delays)
+  - Semantic similarity (AI-powered content matching)
+- **Composite Scoring**: Rewards commits matching multiple strategies with confidence bonuses
+- **Smart Caching**: Local cache with configurable TTL to minimize API calls
+- **Graceful Degradation**: Automatically disabled if prerequisites unavailable
+
+#### Configuration
+
+```yaml
+integrations:
+  github:
+    matching:
+      enabled: true
+      cache_ttl_hours: 24
+      time_window_days: 14
+      confidence_threshold: 0.85
+
+      fetch:
+        issues: true
+        pull_requests: true
+        projects: true
+        milestones: true
+
+      strategies:
+        explicit_reference: true
+        timestamp_correlation: true
+        semantic_similarity: true
+
+      scoring:
+        timestamp_and_semantic_bonus: 0.15
+        all_strategies_bonus: 0.20
+
+    references:
+      # Technical changelog
+      changelog:
+        format: "detailed"  # Show all references
+        show_issue_refs: true
+        show_pr_refs: true
+        show_project_refs: true
+
+      # User-facing notes
+      release_notes:
+        format: "minimal"  # Just issue numbers
+        show_issue_refs: true
+        show_pr_refs: false
+```
+
+#### Prerequisites
+
+- GitHub remote repository
+- `gh` CLI installed and authenticated
+- Internet connectivity for initial fetch
+
+#### Example Output
+
+**CHANGELOG.md (detailed format):**
+```markdown
+### Added
+- REST API v2 with pagination support (#234, @dev1)
+  [Closes: #189, #201 | PR: #234 | Project: Backend Roadmap | Milestone: v2.0.0]
+```
+
+**RELEASE_NOTES.md (minimal format):**
+```markdown
+#### ✨ Real-Time Notifications [#189]
+Never miss important updates! We've added real-time notifications...
 ```
 
 ### Custom Categories

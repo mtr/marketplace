@@ -282,6 +282,26 @@ I provide:
 5. **Hotfixes**: Identify and prioritize critical fixes
 6. **Release Branches**: Handle multiple active versions
 
+## GitHub Integration (Optional)
+
+If GitHub matching is enabled in `.changelog.yaml`, after completing my analysis, I pass my structured output to the **github-matcher** agent for enrichment:
+
+```
+[Invokes github-matcher agent with commit data]
+```
+
+The github-matcher agent:
+- Matches commits to GitHub Issues, PRs, Projects, and Milestones
+- Adds GitHub artifact references to commit data
+- Returns enriched data with confidence scores
+
+This enrichment is transparent to my core analysis logic and only occurs if:
+1. GitHub remote is detected
+2. `gh` CLI is available and authenticated
+3. `integrations.github.matching.enabled: true` in config
+
+If GitHub integration fails or is unavailable, my output passes through unchanged.
+
 ## Invocation Context
 
 I should be invoked when:
