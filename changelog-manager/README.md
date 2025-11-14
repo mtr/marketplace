@@ -413,5 +413,5 @@ See [CHANGELOG.md](CHANGELOG.md) for detailed version history.
 
 ---
 
-**Created by Dr. Martin
+**Created by Dr. Martin Thorsen Ranang
 ** | [GitHub](https://github.com/mtr) | [Website](https://zemantiq.com)

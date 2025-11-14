@@ -330,5 +330,5 @@ MIT License - See LICENSE file
 
 **Plugin Version**: 1.0.0  
 **Claude Code Compatibility**: >=1.0.0  
-**Author**: Dr. Martin  
+**Author**: Dr. Martin Thorsen Ranang  
 **Last Updated**: November 13, 2025
