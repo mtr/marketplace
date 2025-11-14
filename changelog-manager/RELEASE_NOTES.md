@@ -25,10 +25,10 @@ The plugin intelligently groups and categorizes your changes:
 - Categorizes changes following industry standards
 - Prioritizes by user impact
 
-#### ⚡ Lightning-Fast Analysis
-Using an optimized AI model (Claude Haiku) for commit analysis means:
-- Process hundreds of commits in seconds
-- Minimal API costs
+#### ⚡ Comprehensive Analysis
+Using an advanced AI model (Claude 4.5 Sonnet) for commit analysis means:
+- Deep understanding of code changes
+- Accurate categorization and impact assessment
 - Efficient batch processing
 - Smart caching for repeated analysis
 

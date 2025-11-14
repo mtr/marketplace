@@ -1,7 +1,7 @@
 ---
 description: Analyzes git commit history to extract, group, and categorize changes for changelog generation
 capabilities: ["git-analysis", "commit-grouping", "version-detection", "branch-analysis", "pr-correlation"]
-model: "claude-3-5-sonnet-latest"
+model: "claude-4-5-sonnet-latest"
 ---
 
 # Git History Analyzer Agent

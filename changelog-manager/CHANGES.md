@@ -25,7 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - Groups commits by PR, feature branch, and semantic similarity
     - Detects breaking changes and version patterns
     - Supports monorepo structures
-  - **commit-analyst**: Deep analysis using Claude 4.5 Haiku for efficiency
+  - **commit-analyst**: Deep analysis using Claude 4.5 Sonnet for accuracy
     - Understands vague commit messages through diff analysis
     - Identifies hidden breaking changes
     - Extracts semantic meaning from code changes

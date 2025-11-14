@@ -121,7 +121,7 @@ versioning:
 # AI analysis settings
 ai_analysis:
   # Model for commit analysis
-  model: "claude-3-haiku"  # Fast and efficient for code analysis
+  model: "claude-4-5-sonnet"  # Fast and efficient for code analysis
   
   # Analyze commits with unclear messages
   analyze_unclear: true

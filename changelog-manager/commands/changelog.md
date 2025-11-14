@@ -47,7 +47,7 @@ different audiences.
 ### Phase 3: Commit Understanding
 
 - For complex or unclear commits:
-    - Analyzes code diffs with AI (Haiku model for efficiency)
+    - Analyzes code diffs with AI (Sonnet model for accuracy)
     - Extracts semantic meaning from changes
     - Correlates with issue tracker references
     - Identifies user impact
@@ -253,7 +253,7 @@ versioning:
 # AI analysis settings
 ai_analysis:
   # Model for commit analysis
-  model: "claude-3-haiku" # Fast and efficient for code analysis
+  model: "claude-4-5-sonnet" # Fast and efficient for code analysis
 
   # Analyze commits with unclear messages
   analyze_unclear: true

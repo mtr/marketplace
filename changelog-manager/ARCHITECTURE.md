@@ -20,7 +20,7 @@ The changelog-manager plugin follows a sophisticated multi-agent architecture de
 ┌──────────────┐ ┌──────────────┐ ┌──────────────────────────┐
 │ Git History  │ │   Commit     │ │  Changelog Synthesizer   │
 │  Analyzer    │ │   Analyst    │ │       (Sonnet)           │
-│  (Sonnet)    │ │   (Haiku)    │ │                          │
+│  (Sonnet)    │ │   (Sonnet)   │ │                          │
 ├──────────────┤ ├──────────────┤ ├──────────────────────────┤
 │ - Extract    │ │ - Analyze    │ │ - Generate CHANGELOG.md  │
 │   commits    │ │   diffs      │ │ - Generate RELEASE_NOTES │
@@ -51,7 +51,7 @@ The changelog-manager plugin follows a sophisticated multi-agent architecture de
 - **Purpose**: Specialized AI-powered analysis and generation
 - **Components**:
   - **git-history-analyzer**: Repository and commit pattern analysis (Sonnet)
-  - **commit-analyst**: Deep code diff understanding (Haiku for efficiency)
+  - **commit-analyst**: Deep code diff understanding (Sonnet)
   - **changelog-synthesizer**: Documentation generation (Sonnet)
 
 ### 3. Configuration Layer
@@ -69,17 +69,12 @@ The changelog-manager plugin follows a sophisticated multi-agent architecture de
 
 ## Model Strategy
 
-The plugin uses a dual-model approach optimized for both quality and efficiency:
+The plugin uses Claude 4.5 Sonnet for all analysis and generation tasks:
 
 1. **Claude 4.5 Sonnet** (Primary Model)
-   - Used for: High-level analysis, pattern recognition, synthesis
-   - Agents: git-history-analyzer, changelog-synthesizer
-   - Rationale: Complex reasoning and generation tasks
-
-2. **Claude 4.5 Haiku** (Analysis Model)
-   - Used for: Individual commit analysis, diff understanding
-   - Agent: commit-analyst
-   - Rationale: Fast, efficient, cost-effective for repetitive analysis
+   - Used for: All analysis, pattern recognition, and synthesis tasks
+   - Agents: git-history-analyzer, commit-analyst, changelog-synthesizer
+   - Rationale: Comprehensive reasoning, deep code understanding, and high-quality generation
 
 ## Deployment Instructions
 
@@ -215,7 +210,7 @@ versioning:
 
 ### Token Usage Optimization
 
-1. **Haiku for Analysis**: ~70% token cost reduction
+1. **Efficient Context Management**: Focused analysis windows for optimal token usage
 2. **Batch Processing**: Groups similar commits
 3. **Caching**: Avoids re-analyzing unchanged commits
 4. **Smart Sampling**: Analyzes representative diffs for large changes
@@ -288,7 +283,7 @@ claude-code --command "/changelog update --dry-run"
 1. **API Security**: All Claude API calls handled by Claude Code
 2. **Repository Access**: Only local git operations
 3. **No External Services**: No data sent to third parties
-4. **Token Management**: Efficient token usage with Haiku
+4. **Token Management**: Efficient token usage with optimized context windows
 5. **Configuration**: Sensitive data should not be in .changelog.yaml
 
 ## Future Enhancements

@@ -1,7 +1,7 @@
 ---
 description: Analyzes individual commits and code patches using AI to understand purpose, impact, and technical changes
 capabilities: ["diff-analysis", "code-understanding", "impact-assessment", "semantic-extraction", "pattern-recognition"]
-model: "claude-3-haiku-latest"
+model: "claude-4-5-sonnet-latest"
 ---
 
 # Commit Analyst Agent
@@ -11,7 +11,7 @@ model: "claude-3-haiku-latest"
 I specialize in deep analysis of individual commits and code changes using
 efficient AI processing. When commit messages are unclear or changes are
 complex, I examine the actual code diff to understand the true purpose and
-impact of changes. I'm optimized for speed and efficiency using the Haiku model.
+impact of changes.
 
 ## Core Capabilities
 
@@ -83,9 +83,9 @@ def analyze_commit(commit_hash):
     
     # Get the actual diff
     diff_content = get_diff(commit_hash)
-    
-    # Analyze with AI (Haiku for efficiency)
-    analysis = analyze_with_haiku(diff_content, metadata)
+
+    # Analyze with AI
+    analysis = analyze_with_ai(diff_content, metadata)
     
     return {
         'purpose': analysis['extracted_purpose'],
@@ -332,14 +332,14 @@ I should be invoked when:
 
 ## Efficiency Optimizations
 
-As a Haiku-powered agent, I'm optimized for:
+I'm optimized for:
 
-- **Speed**: ~2-3 seconds per commit analysis
-- **Token Efficiency**: Focused context windows
+- **Accuracy**: Deep understanding of code changes and their implications
+- **Context Awareness**: Comprehensive analysis with broader context windows
 - **Batch Processing**: Analyze multiple commits in parallel
 - **Smart Sampling**: Analyze representative changes in large diffs
 - **Pattern Matching**: Quick identification of common patterns
 - **Incremental Analysis**: Build on previous analyses
 
 This makes me ideal for analyzing large repositories with extensive commit
-history while maintaining cost efficiency and speed.
+history while maintaining high accuracy and insight quality.

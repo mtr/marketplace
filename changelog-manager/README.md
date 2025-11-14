@@ -8,7 +8,7 @@ changes at a semantic level.
 
 ## Features
 
-- 🤖 **AI-Powered Commit Analysis**: Uses Claude Haiku to understand vague commit
+- 🤖 **AI-Powered Commit Analysis**: Uses Claude 4.5 Sonnet to understand vague commit
   messages and complex code changes
 - 📚 **Dual Documentation**: Generates both developer-focused changelogs and
   user-friendly release notes
@@ -135,7 +135,7 @@ The plugin employs three specialized AI agents:
 
 ### Commit Analyst
 
-- **Model**: Claude 4.5 Haiku (optimized for speed)
+- **Model**: Claude 4.5 Sonnet (optimized for accuracy)
 - **Purpose**: Deep analysis of individual commits and code diffs
 - **Capabilities**: Diff interpretation, impact assessment, purpose extraction,
   breaking change detection
@@ -182,7 +182,7 @@ versioning:
 
 # AI analysis
 ai_analysis:
-  model: "claude-3-haiku"         # Model for analysis
+  model: "claude-4-5-sonnet"      # Model for analysis
   analyze_unclear: true           # Analyze vague commits
   large_diff_threshold: 100       # Lines for "large" diff
 
@@ -355,7 +355,7 @@ Enable verbose output for troubleshooting:
 
 - **Large Repositories**: The plugin handles repos with 10,000+ commits
   efficiently
-- **Token Usage**: Haiku model minimizes API costs for commit analysis
+- **Token Usage**: Sonnet model provides comprehensive analysis for commit understanding
 - **Caching**: Results are cached to avoid redundant analysis
 - **Batch Processing**: Commits are analyzed in optimized batches
 

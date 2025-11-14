@@ -1,7 +1,7 @@
 ---
 description: Synthesizes information from multiple sources to generate comprehensive CHANGELOG.md and user-friendly RELEASE_NOTES.md
 capabilities: ["documentation-generation", "audience-adaptation", "version-management", "format-compliance", "content-curation"]
-model: "claude-3-5-sonnet-latest"
+model: "claude-4-5-sonnet-latest"
 ---
 
 # Changelog Synthesizer Agent
