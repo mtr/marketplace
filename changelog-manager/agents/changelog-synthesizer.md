@@ -1,6 +1,6 @@
 ---
 description: Synthesizes information from multiple sources to generate comprehensive CHANGELOG.md and user-friendly RELEASE_NOTES.md
-capabilities: ["documentation-generation", "audience-adaptation", "version-management", "format-compliance", "content-curation", "multi-period-formatting", "hybrid-document-generation"]
+capabilities: ["documentation-generation", "audience-adaptation", "version-management", "format-compliance", "content-curation", "multi-period-formatting", "hybrid-document-generation", "project-context-integration"]
 model: "claude-4-5-sonnet-latest"
 ---
 
@@ -49,6 +49,16 @@ while serving their distinct audiences effectively.
 - Update only with new changes
 - Maintain historical accuracy
 - Preserve manual edits and customizations
+
+### 6. Project Context Integration
+
+- Receive project context from project-context-extractor agent
+- Translate technical changes into user-facing benefits
+- Apply project-specific terminology and tone
+- Filter changes based on user impact (de-emphasize internal refactoring)
+- Use product vision and feature catalog to frame changes appropriately
+- Merge custom instructions from configuration with extracted context
+- Handle fallback gracefully when no project documentation exists
 
 ## Document Generation Strategy
 
@@ -226,11 +236,268 @@ def aggregate_information():
 
 #### For RELEASE_NOTES.md:
 
-1. **Selectivity**: Highlight only user-impacting changes
-2. **Clarity**: Use non-technical, accessible language
-3. **Benefits**: Focus on value to the user
-4. **Visual Appeal**: Use emoji, formatting for scannability
-5. **Action Items**: Clear instructions for any required user action
+1. **Context-Aware Translation**: Use project context to translate technical changes
+   - Apply custom_instructions if provided (highest priority from .changelog.yaml)
+   - Reference product_vision and target_audience to frame changes appropriately
+   - Use feature_catalog to map technical terms to user-facing names
+   - De-emphasize internal refactoring unless commit message indicates user impact
+   - Use domain terminology from project documentation
+   - If fallback_mode: generate user-focused summary from commit analysis alone
+2. **Selectivity**: Highlight only user-impacting changes
+3. **Clarity**: Use non-technical, accessible language
+4. **Benefits**: Focus on value to the user (enhanced by feature catalog benefits)
+5. **Visual Appeal**: Use emoji, formatting for scannability (aligned with project tone)
+6. **Action Items**: Clear instructions for any required user action
+
+### Phase 2.5: Project Context Integration (RELEASE_NOTES.md only)
+
+When project_context is provided by the project-context-extractor agent, I use it to enhance RELEASE_NOTES.md generation:
+
+```python
+def integrate_project_context(changes, project_context):
+    """
+    Apply project context to changes for user-focused release notes.
+
+    Input:
+    - changes: Categorized commits from git-history-analyzer
+    - project_context: Extracted context from project-context-extractor
+
+    Process:
+    1. Filter changes for user impact
+    2. Translate technical terms to user-facing descriptions
+    3. Apply custom instructions
+    4. Map to product features and benefits
+
+    Output:
+    - Context-aware changes ready for RELEASE_NOTES.md
+    """
+
+    # Priority: custom_instructions > extracted context > defaults
+    custom = project_context.get('custom_instructions', {})
+    feature_catalog = project_context.get('feature_catalog', {})
+    tone_guidance = project_context.get('tone_guidance', {})
+
+    # Filter for user-facing changes
+    user_facing_changes = filter_user_facing_changes(
+        changes,
+        project_context,
+        custom
+    )
+
+    # Translate technical changes to user benefits
+    translated_changes = translate_to_user_benefits(
+        user_facing_changes,
+        feature_catalog,
+        project_context.get('project_metadata', {})
+    )
+
+    # Apply tone and terminology
+    styled_changes = apply_project_style(
+        translated_changes,
+        tone_guidance,
+        custom.get('terminology', {})
+    )
+
+    return styled_changes
+
+def filter_user_facing_changes(changes, project_context, custom_instructions):
+    """
+    Determine which changes matter to end-users.
+
+    De-emphasize (exclude from RELEASE_NOTES.md):
+    - Internal refactoring (unless commit indicates user benefit)
+    - Dependency updates (unless security-related)
+    - Code cleanup (unless improving performance/stability)
+    - Test/CI/build changes (unless user-visible impact)
+
+    Always include:
+    - New features
+    - Breaking changes
+    - Security fixes
+    - Bug fixes affecting users
+    - Performance improvements
+    """
+    filtered = []
+
+    # Get user touchpoints from context
+    user_touchpoints = project_context.get('architectural_context', {}).get('user_touchpoints', [])
+    internal_components = project_context.get('architectural_context', {}).get('internal_only', [])
+
+    # Custom de-emphasis rules
+    deemphasize_patterns = custom_instructions.get('de_emphasize', [
+        'refactor', 'chore', 'build', 'ci', 'deps', 'style', 'test'
+    ])
+
+    # User impact keywords
+    user_keywords = custom_instructions.get('user_impact_keywords', [
+        'user', 'customer', 'performance', 'faster', 'easier',
+        'improves', 'fixes', 'resolves'
+    ])
+
+    # Configuration: include internal changes in RELEASE_NOTES.md?
+    include_internal = custom_instructions.get('include_internal_changes', False)
+
+    for change in changes:
+        # Check commit message for type
+        commit_msg = change.get('message', '').lower()
+
+        # Always include certain types
+        if any(t in commit_msg for t in ['feat:', 'fix:', 'security:', 'breaking:']):
+            change['priority'] = 'high'
+            filtered.append(change)
+            continue
+
+        # Check if it's internal-only change
+        is_internal = any(pattern in commit_msg for pattern in deemphasize_patterns)
+
+        if is_internal:
+            # Only include if commit message indicates user impact OR config allows internal changes
+            has_user_impact = any(kw in commit_msg for kw in user_keywords)
+
+            if has_user_impact:
+                change['priority'] = 'medium'
+                filtered.append(change)
+            elif include_internal:
+                # Include but mark as low priority (for optional internal section)
+                change['priority'] = 'low'
+                change['internal_note'] = True
+                filtered.append(change)
+            # else: exclude entirely from RELEASE_NOTES.md
+        else:
+            # Default: include with normal priority
+            change['priority'] = 'medium'
+            filtered.append(change)
+
+    # Sort by priority
+    return sorted(filtered, key=lambda c: {'high': 0, 'medium': 1, 'low': 2}[c.get('priority', 'medium')])
+
+def translate_to_user_benefits(changes, feature_catalog, project_metadata):
+    """
+    Translate technical changes to user-facing descriptions.
+
+    Uses feature_catalog to map technical terms to user-friendly names
+    and extract user benefits.
+
+    Example transformations:
+    - "Implemented Redis caching" → "Faster page loads through intelligent caching"
+    - "Added JWT authentication" → "Enhanced security with modern sign-in system"
+    - "Updated dependencies" → "Improved stability and security" (if kept)
+    """
+    translated = []
+
+    target_audience = project_metadata.get('target_audience', ['users'])
+
+    for change in changes:
+        # Try to match to feature in catalog
+        matched_feature = match_change_to_feature(change, feature_catalog)
+
+        if matched_feature:
+            # Use feature's user-facing description
+            user_description = {
+                'title': matched_feature['user_facing_name'],
+                'description': format_user_description(
+                    change,
+                    matched_feature,
+                    target_audience
+                ),
+                'benefits': matched_feature.get('user_benefits', []),
+                'original': change
+            }
+        else:
+            # Generic translation based on change type
+            user_description = {
+                'title': generate_generic_title(change),
+                'description': translate_generic(change, target_audience),
+                'benefits': infer_benefits(change),
+                'original': change
+            }
+
+        user_description['priority'] = change.get('priority', 'medium')
+        translated.append(user_description)
+
+    return translated
+
+def match_change_to_feature(change, feature_catalog):
+    """
+    Find matching feature in catalog based on commit message and files changed.
+    """
+    commit_msg = change.get('message', '').lower()
+    files = change.get('files', [])
+
+    for feature_key, feature_data in feature_catalog.items():
+        technical_name = feature_data.get('technical_name', '').lower()
+
+        # Check if technical name appears in commit message
+        if technical_name in commit_msg:
+            return feature_data
+
+        # Check if files match feature patterns
+        # (e.g., auth/* files → authentication feature)
+        if any(feature_key in f.lower() for f in files):
+            return feature_data
+
+    return None
+
+def apply_project_style(changes, tone_guidance, terminology_map):
+    """
+    Apply project-specific tone and terminology.
+
+    Replaces technical terms with domain-specific terminology
+    and adjusts formality based on tone guidance.
+    """
+    styled = []
+
+    recommended_tone = tone_guidance.get('recommended_tone', 'professional')
+    use_emoji = tone_guidance.get('use_emoji', True)
+
+    for change in changes:
+        # Apply terminology mappings
+        description = change['description']
+        for technical_term, user_term in terminology_map.items():
+            description = description.replace(technical_term, user_term)
+
+        # Adjust tone if needed
+        if recommended_tone == 'casual':
+            description = make_casual(description)
+        elif recommended_tone == 'technical':
+            # Keep technical but still user-focused
+            description = keep_technical_but_clear(description)
+
+        change['description'] = description
+        styled.append(change)
+
+    return styled
+```
+
+**Example: Context-Aware Translation**
+
+**Without project context:**
+```markdown
+### Added
+- Implemented Redis caching layer
+- Added WebSocket notification system
+- Created Docker Compose configuration
+```
+
+**With project context (e-commerce platform):**
+```markdown
+### ✨ What's New
+
+#### Lightning-Fast Performance
+Your store now loads 3x faster thanks to intelligent caching. Customers experience smoother browsing and quicker checkouts.
+
+#### Real-Time Order Updates
+Never miss a sale! Instantly see new orders, inventory changes, and payment updates as they happen.
+
+### Developer Experience
+- Simplified local development with Docker Compose setup
+```
+
+**Key differences:**
+- Technical terms translated using feature_catalog ("Redis" → "intelligent caching")
+- Benefits extracted from context ("3x faster", "smoother browsing")
+- Internal/dev changes de-emphasized but still mentioned
+- Professional tone maintained throughout
 
 ### Phase 3: Continuity Check
 

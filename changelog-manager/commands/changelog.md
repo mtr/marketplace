@@ -263,16 +263,39 @@ ai_analysis:
 
   # Threshold for "large" diff (lines changed)
   large_diff_threshold: 100
+
+# Project context integration (NEW - makes RELEASE_NOTES.md more end-user focused)
+release_notes:
+  # Enable reading CLAUDE.md, README.md, and docs/ for context
+  project_context_enabled: true
+  project_context_sources:
+    - "CLAUDE.md"
+    - "README.md"
+    - "docs/**/*.md"
+  project_context_max_length: 5000
+  project_context_cache_ttl_hours: 24
+
+  # Custom instructions (highest priority - override extracted context)
+  emphasis_areas: ["Security", "Performance", "User Experience"]
+  de_emphasize: ["refactor", "chore", "build", "ci", "deps"]
+  include_internal_changes: false  # Exclude internal changes from release notes
+  user_impact_keywords: ["user", "customer", "performance", "faster"]
+  terminology:
+    authentication: "sign-in system"
+    API: "developer tools"
 ```
 
 ## Agents Used
 
 This command coordinates multiple specialized agents:
 
+- **project-context-extractor**: Reads project documentation (CLAUDE.md, README.md,
+  docs/) to understand product vision, target audience, and user-facing features
 - **git-history-analyzer**: Examines commit history and groups related changes
 - **commit-analyst**: Uses AI to understand complex commits and code changes
 - **changelog-synthesizer**: Combines information to generate both technical and
-  user-facing documentation
+  user-facing documentation, using project context to make RELEASE_NOTES.md more
+  end-user focused
 
 ## Best Practices
 

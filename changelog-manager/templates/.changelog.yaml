@@ -78,6 +78,65 @@ release_notes:
   # Include "Coming Soon" section
   include_upcoming: true
 
+  # Project context integration (enabled by default)
+  project_context_enabled: true
+
+  # Project context sources (priority order: .changelog.yaml > CLAUDE.md > README.md > docs/)
+  project_context_sources:
+    - "CLAUDE.md"
+    - "README.md"
+    - "docs/README.md"
+    - "docs/**/*.md"
+
+  # Maximum characters per file for context extraction
+  project_context_max_length: 5000
+
+  # Cache project context for faster subsequent runs
+  project_context_cache_ttl_hours: 24
+
+  # Fallback if no documentation found: "generate_generic_context", "use_defaults", "skip"
+  project_context_fallback: "generate_generic_context"
+
+  # Custom instructions (HIGHEST priority - override extracted context)
+  emphasis_areas:
+    - "Security"
+    - "Performance"
+    - "User Experience"
+
+  # De-emphasize these in RELEASE_NOTES.md (unless commit indicates user impact)
+  de_emphasize:
+    - "refactor"
+    - "chore"
+    - "build"
+    - "ci"
+    - "deps"
+    - "style"
+    - "test"
+
+  # Include internal changes in RELEASE_NOTES.md (default: false - they're excluded)
+  include_internal_changes: false
+
+  # Keywords indicating user impact (include even if normally de-emphasized)
+  user_impact_keywords:
+    - "user"
+    - "customer"
+    - "performance"
+    - "faster"
+    - "easier"
+    - "improves"
+    - "fixes"
+    - "resolves"
+
+  # Custom terminology mappings (technical term → user-facing term)
+  terminology: {}
+    # Example:
+    # authentication: "sign-in system"
+    # API: "developer tools"
+
+  # Special notes for release notes generation
+  special_notes: []
+    # Example: "Always mention migration guides for breaking changes"
+
 # Historical Replay Configuration (for /changelog-init --replay)
 replay:
   # Enable replay mode by default for changelog initialization
