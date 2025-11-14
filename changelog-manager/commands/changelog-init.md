@@ -146,7 +146,7 @@ Batch 2/21: Analyzing periods 4-6 in parallel...
 **Per-Period Analysis:**
 Each period invokes:
 1. **git-history-analyzer** (Sonnet): Extract and group commits for period
-2. **commit-analyst** (Haiku): Batch-analyze unclear commits
+2. **commit-analyst** (Haiku): Batch-analyze unclear commits (invoked automatically by git-history-analyzer)
 3. Caching: Results cached per period for instant regeneration
 
 ### Phase 4: Changelog Synthesis
@@ -215,6 +215,132 @@ Actions:
 1. Review generated files? [Y/n]
 2. Commit to git? [Y/n]
 3. Create version tag? [y/N]
+```
+
+## Agent Orchestration
+
+**CRITICAL**: You MUST use the Task tool to invoke these agents in the correct sequence.
+
+### Standard Mode Agent Sequence
+
+For standard `/changelog-init` (non-replay):
+
+#### 1. Project Context Extractor (Claude Haiku)
+
+```
+Use Task tool with:
+- subagent_type: "changelog-manager:project-context-extractor"
+- description: "Extract project context from documentation"
+- prompt: "Analyze CLAUDE.md, README.md, and docs/ to extract project context for user-focused release notes."
+```
+
+#### 2. Git History Analyzer (Claude Sonnet)
+
+```
+Use Task tool with:
+- subagent_type: "changelog-manager:git-history-analyzer"
+- description: "Analyze entire git history"
+- prompt: "Extract all commits from beginning (or specified tag), group by releases/PRs/features, categorize changes, and detect breaking changes."
+```
+
+#### 3. GitHub Matcher (Claude Sonnet) - OPTIONAL
+
+```
+Only invoke if GitHub integration enabled.
+
+Use Task tool with:
+- subagent_type: "changelog-manager:github-matcher"
+- description: "Match commits to GitHub artifacts"
+- prompt: "Enrich all historical commits with GitHub references."
+```
+
+#### 4. Changelog Synthesizer (Claude Sonnet)
+
+```
+Use Task tool with:
+- subagent_type: "changelog-manager:changelog-synthesizer"
+- description: "Generate initial changelog files"
+- prompt: "Generate complete CHANGELOG.md and RELEASE_NOTES.md from entire project history using project context for user focus."
+```
+
+### Replay Mode Agent Sequence
+
+For `/changelog-init --replay` (period-based historical generation):
+
+#### 1. Project Context Extractor (Claude Haiku)
+
+Same as standard mode.
+
+#### 2. Period Detector (Claude Haiku)
+
+```
+Use Task tool with:
+- subagent_type: "changelog-manager:period-detector"
+- description: "Detect optimal period strategy"
+- prompt: "Analyze repository history to detect optimal period strategy (daily/weekly/monthly/by-release), calculate period boundaries, and present options to user."
+```
+
+**Purpose**: Analyzes commit frequency, project age, and release patterns to recommend optimal period grouping strategy.
+
+**Output**: Period boundaries with start/end commits and dates for each period.
+
+#### 3. Period Coordinator (Claude Sonnet)
+
+```
+Use Task tool with:
+- subagent_type: "changelog-manager:period-coordinator"
+- description: "Orchestrate multi-period analysis"
+- prompt: "Coordinate parallel analysis of all periods by invoking git-history-analyzer for each period, managing cache, and handling retries."
+```
+
+**Purpose**: Orchestrates parallel analysis of all time periods, invoking git-history-analyzer once per period with period context.
+
+**Sub-invocations** (managed by period-coordinator):
+- For each period: Invokes **git-history-analyzer** with period boundaries
+- Optional: Invokes **github-matcher** to enrich period commits
+- Caches results per period for fast regeneration
+
+#### 4. Changelog Synthesizer (Claude Sonnet)
+
+```
+Use Task tool with:
+- subagent_type: "changelog-manager:changelog-synthesizer"
+- description: "Generate hybrid-format changelogs"
+- prompt: "Generate hybrid-format CHANGELOG.md (versions with period subsections) and period-aware RELEASE_NOTES.md from multi-period analysis."
+```
+
+**Purpose**: Synthesizes period-based analysis into hybrid changelog format with version sections containing period subsections.
+
+### Integration Flow
+
+**Standard Mode:**
+```
+project-context-extractor (Haiku)
+         ↓
+git-history-analyzer (Sonnet)
+         ↓
+github-matcher (Sonnet) [OPTIONAL]
+         ↓
+changelog-synthesizer (Sonnet)
+         ↓
+    Write files
+```
+
+**Replay Mode:**
+```
+project-context-extractor (Haiku)
+         ↓
+period-detector (Haiku)
+         ↓
+period-coordinator (Sonnet)
+    ↓
+    └─→ [For each period in parallel]
+         git-history-analyzer (Sonnet)
+         github-matcher (Sonnet) [OPTIONAL]
+         ↓
+changelog-synthesizer (Sonnet)
+         ↓
+    Write files
 ```
 
 ## Options

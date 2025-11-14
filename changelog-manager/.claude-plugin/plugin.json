@@ -1,6 +1,6 @@
 {
   "name": "changelog-manager",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Intelligent CHANGELOG.md and RELEASE_NOTES.md management through git history analysis and AI-powered commit understanding with GitHub integration",
   "author": {
     "name": "Dr. Martin Thorsen Ranang",

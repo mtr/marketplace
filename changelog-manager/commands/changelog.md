@@ -285,6 +285,93 @@ release_notes:
     API: "developer tools"
 ```
 
+## Agent Orchestration
+
+**CRITICAL**: You MUST use the Task tool to invoke these agents in sequence. The workflow will fail if you don't invoke agents properly.
+
+### Agent Invocation Sequence
+
+Invoke agents using the Task tool in this exact order:
+
+#### 1. Project Context Extractor (Claude Haiku)
+
+```
+Use Task tool with:
+- subagent_type: "changelog-manager:project-context-extractor"
+- description: "Extract project context from documentation"
+- prompt: "Analyze CLAUDE.md, README.md, and docs/ to extract project context, target audience, feature catalog, and tone guidance for generating user-focused release notes."
+```
+
+**Purpose**: Reads project documentation to understand product vision, target audience, user personas, and how to translate technical changes into user benefits.
+
+**Output**: Project context object with feature catalog, tone guidance, and custom instructions.
+
+#### 2. Git History Analyzer (Claude Sonnet)
+
+```
+Use Task tool with:
+- subagent_type: "changelog-manager:git-history-analyzer"
+- description: "Analyze git history and group commits"
+- prompt: "Extract commits since last update, group by pull request/feature branch/semantic similarity, categorize changes following Keep a Changelog format, and detect breaking changes."
+```
+
+**Purpose**: Examines commit history, groups related changes, categorizes them, and identifies breaking changes.
+
+**Output**: Structured change data categorized as Added/Changed/Fixed/etc.
+
+#### 3. GitHub Matcher (Claude Sonnet) - OPTIONAL
+
+```
+Only invoke if:
+- GitHub remote detected
+- gh CLI available and authenticated
+- integrations.github.matching.enabled: true in config
+
+Use Task tool with:
+- subagent_type: "changelog-manager:github-matcher"
+- description: "Match commits to GitHub artifacts"
+- prompt: "Enrich commit data with GitHub Issue, PR, Project, and Milestone references using explicit matching, timestamp correlation, and semantic similarity."
+```
+
+**Purpose**: Matches commits to GitHub Issues, PRs, Projects, and Milestones using multiple strategies with confidence scoring.
+
+**Output**: Enriched commit data with GitHub artifact references.
+
+#### 4. Changelog Synthesizer (Claude Sonnet)
+
+```
+Use Task tool with:
+- subagent_type: "changelog-manager:changelog-synthesizer"
+- description: "Generate changelog documentation"
+- prompt: "Generate CHANGELOG.md (technical, developer-focused) and RELEASE_NOTES.md (user-facing, benefits-focused) using project context to translate technical changes into user benefits."
+```
+
+**Purpose**: Combines all information to generate both technical and user-facing documentation, using project context to make RELEASE_NOTES.md more end-user focused.
+
+**Output**: Final CHANGELOG.md and RELEASE_NOTES.md content.
+
+### Integration Flow
+
+```
+project-context-extractor (Haiku)
+         ↓
+         ↓ [project_context]
+         ↓
+git-history-analyzer (Sonnet)
+         ↓
+         ↓ [git_analysis]
+         ↓
+github-matcher (Sonnet) [OPTIONAL]
+         ↓
+         ↓ [enhanced_analysis]
+         ↓
+changelog-synthesizer (Sonnet)
+         ↓
+         ↓ [final_documents]
+         ↓
+    Write files
+```
+
 ## Agents Used
 
 This command coordinates multiple specialized agents:
@@ -292,7 +379,8 @@ This command coordinates multiple specialized agents:
 - **project-context-extractor**: Reads project documentation (CLAUDE.md, README.md,
   docs/) to understand product vision, target audience, and user-facing features
 - **git-history-analyzer**: Examines commit history and groups related changes
-- **commit-analyst**: Uses AI to understand complex commits and code changes
+- **commit-analyst**: Uses AI to understand complex commits and code changes (invoked automatically by git-history-analyzer when needed)
+- **github-matcher**: Matches commits to GitHub Issues, PRs, Projects, and Milestones (optional, only if configured)
 - **changelog-synthesizer**: Combines information to generate both technical and
   user-facing documentation, using project context to make RELEASE_NOTES.md more
   end-user focused

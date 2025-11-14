@@ -62,6 +62,93 @@ finalization, version bumping, and release artifact generation.
 - Generate release checklist
 - Create follow-up tasks
 
+## Agent Orchestration
+
+**CRITICAL**: You MUST use the Task tool to invoke these agents in sequence for the release workflow.
+
+### Agent Invocation Sequence
+
+Invoke agents using the Task tool in this exact order:
+
+#### 1. Project Context Extractor (Claude Haiku)
+
+```
+Use Task tool with:
+- subagent_type: "changelog-manager:project-context-extractor"
+- description: "Extract project context from documentation"
+- prompt: "Analyze CLAUDE.md, README.md, and docs/ to extract project context for user-focused release notes."
+```
+
+**Purpose**: Reads project documentation to understand how to communicate release information to users.
+
+**Output**: Project context object with feature catalog, tone guidance, and custom instructions.
+
+#### 2. Git History Analyzer (Claude Sonnet)
+
+```
+Use Task tool with:
+- subagent_type: "changelog-manager:git-history-analyzer"
+- description: "Analyze unreleased changes"
+- prompt: "Extract all unreleased commits (since last version tag), group by PR/feature/semantic similarity, categorize changes, and detect breaking changes to determine appropriate version bump."
+```
+
+**Purpose**: Analyzes unreleased changes to determine version bump strategy and validate changelog entries.
+
+**Output**: Structured change data with version bump recommendation (major/minor/patch).
+
+#### 3. GitHub Matcher (Claude Sonnet) - OPTIONAL
+
+```
+Only invoke if GitHub integration enabled.
+
+Use Task tool with:
+- subagent_type: "changelog-manager:github-matcher"
+- description: "Match unreleased commits to GitHub artifacts"
+- prompt: "Enrich unreleased commits with GitHub Issue, PR, Project, and Milestone references for comprehensive release notes."
+```
+
+**Purpose**: Adds GitHub artifact references to release documentation.
+
+**Output**: Enriched commit data with GitHub references.
+
+#### 4. Changelog Synthesizer (Claude Sonnet)
+
+```
+Use Task tool with:
+- subagent_type: "changelog-manager:changelog-synthesizer"
+- description: "Finalize release documentation"
+- prompt: "Move 'Unreleased' section to versioned release section in CHANGELOG.md, generate user-facing RELEASE_NOTES.md for the new version, create release announcement template, and set up new 'Unreleased' section."
+```
+
+**Purpose**: Finalizes changelog documentation for the release, generates announcement templates.
+
+**Output**: Updated CHANGELOG.md, RELEASE_NOTES.md, and release announcement template.
+
+### Integration Flow
+
+```
+project-context-extractor (Haiku)
+         ↓
+         ↓ [project_context]
+         ↓
+git-history-analyzer (Sonnet)
+         ↓
+         ↓ [git_analysis + version_recommendation]
+         ↓
+github-matcher (Sonnet) [OPTIONAL]
+         ↓
+         ↓ [enhanced_analysis]
+         ↓
+changelog-synthesizer (Sonnet)
+         ↓
+         ↓ [final_release_docs]
+         ↓
+    Update version files
+    Update changelog files
+    Create git commit
+    Create git tag
+```
+
 ## Options
 
 - `--dry-run`: Preview changes without applying
